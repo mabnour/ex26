@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم ونظام إدخال البيانات المالي 2026</title>
+    <!-- Google Fonts: Cairo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Cairo', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0284c7',
+                            600: '#0369a1',
+                            700: '#075985',
+                            800: '#0c4a6e',
+                            900: '#0f172a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Cairo', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .tab-btn.active { border-bottom: 3px solid #0284c7; color: #0284c7; font-weight: 700; background-color: #f0f9ff; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col bg-slate-50 text-slate-800">
+
+    <!-- Header / Navigation -->
+    <header class="bg-slate-900 text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3 space-x-reverse">
+                    <div class="p-2 bg-sky-500 rounded-lg text-white">
+                        <i class="fa-solid fa-wallet text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-lg leading-tight">نظام إدارة الميزانية المالية</h1>
+                        <p class="text-xs text-sky-300">يناير 2026 • متابعة المخطط والفعلي</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2 space-x-reverse">
+                    <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs px-3 py-1 rounded-full font-semibold">
+                        <i class="fa-solid fa-circle-check ml-1"></i> الحالة: مستقر
+                    </span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tabs Navigation -->
+        <div class="bg-slate-800 border-t border-slate-700">
+            <div class="max-w-7xl mx-auto px-4 flex space-x-4 space-x-reverse overflow-x-auto">
+                <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn active px-5 py-3 text-sm flex items-center gap-2 transition-all text-slate-300 hover:text-white">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>لوحة تحليلات الشيت الثاني (Jan 26)</span>
+                </button>
+                <button onclick="switchTab('entry')" id="tab-entry" class="tab-btn px-5 py-3 text-sm flex items-center gap-2 transition-all text-slate-300 hover:text-white">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                    <span>شاشة إدخال المعاملات (Jan)</span>
+                </button>
+                <button onclick="switchTab('comparison')" id="tab-comparison" class="tab-btn px-5 py-3 text-sm flex items-center gap-2 transition-all text-slate-300 hover:text-white">
+                    <i class="fa-solid fa-scale-balanced"></i>
+                    <span>مقارنة المخطط بالفعلي والانحرافات</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- ========================================== -->
+        <!-- TAB 1: DASHBOARD (Jan 26 Sheet Analysis) -->
+        <!-- ========================================== -->
+        <div id="view-dashboard" class="space-y-6">
+            
+            <!-- Top Summary Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                <!-- Card 1: Starting Balance -->
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs text-slate-500 font-medium">الرصيد الافتتاحي</p>
+                            <h3 class="text-xl font-bold text-slate-800 mt-1" id="kpi-start-balance">32,774.00 <span class="text-xs font-normal">ج.م</span></h3>
+                        </div>
+                        <div class="p-2 bg-slate-100 text-slate-600 rounded-lg"><i class="fa-solid fa-vault"></i></div>
+                    </div>
+                    <div class="mt-3 text-xs text-slate-500">بداية شهر يناير 2026</div>
+                </div>
+
+                <!-- Card 2: Ending Balance -->
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs text-slate-500 font-medium">الرصيد الختامي الحاكم</p>
+                            <h3 class="text-xl font-bold text-sky-600 mt-1" id="kpi-end-balance">40,632.50 <span class="text-xs font-normal">ج.م</span></h3>
+                        </div>
+                        <div class="p-2 bg-sky-50 text-sky-600 rounded-lg"><i class="fa-solid fa-piggy-bank"></i></div>
+                    </div>
+                    <div class="mt-3 text-xs text-emerald-600 font-semibold flex items-center gap-1">
+                        <i class="fa-solid fa-arrow-up"></i>
+                        <span>نمو الرصيد: +23.98%</span>
+                    </div>
+                </div>
+
+                <!-- Card 3: Total Income -->
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs text-slate-500 font-medium">إجمالي الإيرادات الفعلي</p>
+                            <h3 class="text-xl font-bold text-emerald-600 mt-1" id="kpi-total-income">96,600.00 <span class="text-xs font-normal">ج.م</span></h3>
+                        </div>
+                        <div class="p-2 bg-emerald-50 text-emerald-600 rounded-lg"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+                    </div>
+                    <div class="mt-3 text-xs text-slate-500">المخطط: 111,776 ج.م</div>
+                </div>
+
+                <!-- Card 4: Total Expenses -->
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs text-slate-500 font-medium">إجمالي المصروفات الفعلي</p>
+                            <h3 class="text-xl font-bold text-rose-600 mt-1" id="kpi-total-expenses">88,741.50 <span class="text-xs font-normal">ج.م</span></h3>
+                        </div>
+                        <div class="p-2 bg-rose-50 text-rose-600 rounded-lg"><i class="fa-solid fa-receipt"></i></div>
+                    </div>
+                    <div class="mt-3 text-xs text-emerald-600 font-medium">وفر في الميزانية: 18,358.5 ج.م</div>
+                </div>
+
+                <!-- Card 5: Net Savings -->
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm bg-gradient-to-br from-emerald-500 to-teal-700 text-white">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs text-emerald-100 font-medium">صافي الوفر التجاري</p>
+                            <h3 class="text-xl font-bold mt-1" id="kpi-net-saved">+7,858.50 <span class="text-xs font-normal">ج.م</span></h3>
+                        </div>
+                        <div class="p-2 bg-white/20 text-white rounded-lg"><i class="fa-solid fa-chart-line"></i></div>
+                    </div>
+                    <div class="mt-3 text-xs text-emerald-100 font-medium">الربح الصافي لهذا الشهر</div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Chart 1: Expenses Breakdown Planned vs Actual -->
+                <div class="lg:col-span-2 bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="flex justify-between items-center mb-4">
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-base">مقارنة المصروفات: المخطط مقابل الفعلي</h3>
+                            <p class="text-xs text-slate-500">حسب فئات الإنفاق الرئيسية في شيت Jan 26</p>
+                        </div>
+                        <span class="text-xs bg-slate-100 text-slate-600 px-2.5 py-1 rounded-md"><i class="fa-solid fa-chart-column ml-1"></i>رسم أعمدة</span>
+                    </div>
+                    <div class="h-80">
+                        <canvas id="expensesChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Chart 2: Expense Distribution Doughnut -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="flex justify-between items-center mb-4">
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-base">توزيع المصروفات الفعلية</h3>
+                            <p class="text-xs text-slate-500">نسب الإنفاق لكل فئة من الإجمالي</p>
+                        </div>
+                        <span class="text-xs bg-slate-100 text-slate-600 px-2.5 py-1 rounded-md"><i class="fa-solid fa-chart-pie ml-1"></i>دائري</span>
+                    </div>
+                    <div class="h-80 relative flex items-center justify-center">
+                        <canvas id="categoryPieChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Income & Accounts Summary Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Income Breakdown Bar -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                    <h3 class="font-bold text-slate-800 text-base mb-1">مصادر الدخل (المخطط vs الفعلي)</h3>
+                    <p class="text-xs text-slate-500 mb-4">توزيع الإيرادات المحصلة خلال شهر يناير</p>
+                    <div class="h-64">
+                        <canvas id="incomeChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Category Health Progress Bars -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                    <h3 class="font-bold text-slate-800 text-base mb-1">نسبة استهلاك الميزانية المخططة</h3>
+                    <p class="text-xs text-slate-500 mb-4">متابعة الفئات الأكثر استهلاكاً للميزانية</p>
+                    
+                    <div class="space-y-3 max-h-64 overflow-y-auto custom-scrollbar pr-1" id="budget-progress-list">
+                        <!-- Dynamic Progress Bars generated by JS -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 2: DATA ENTRY SCREEN (Jan Transactions) -->
+        <!-- ========================================== -->
+        <div id="view-entry" class="hidden space-y-6">
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <!-- Data Entry Form Panel -->
+                <div class="lg:col-span-1 bg-white p-5 rounded-xl border border-slate-200 shadow-sm self-start sticky top-24">
+                    <div class="flex items-center gap-2 pb-3 mb-4 border-b border-slate-100">
+                        <div class="p-2 bg-sky-100 text-sky-600 rounded-lg"><i class="fa-solid fa-plus-circle"></i></div>
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-base">إضافة معاملة جديدة</h3>
+                            <p class="text-xs text-slate-500">تسجيل مباشر في شيت Jan</p>
+                        </div>
+                    </div>
+
+                    <form id="transaction-form" onsubmit="handleAddTransaction(event)" class="space-y-4">
+                        <!-- Transaction Type -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">نوع المعاملة</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <label class="cursor-pointer border border-slate-200 rounded-lg p-2.5 text-center flex items-center justify-center gap-2 transition-all has-[:checked]:border-rose-500 has-[:checked]:bg-rose-50 has-[:checked]:text-rose-700">
+                                    <input type="radio" name="tx_type" value="Expense" checked onchange="updateCategoryOptions()" class="hidden">
+                                    <i class="fa-solid fa-arrow-down text-rose-500"></i>
+                                    <span class="text-xs font-bold">مصروف (Ex)</span>
+                                </label>
+                                <label class="cursor-pointer border border-slate-200 rounded-lg p-2.5 text-center flex items-center justify-center gap-2 transition-all has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50 has-[:checked]:text-emerald-700">
+                                    <input type="radio" name="tx_type" value="Income" onchange="updateCategoryOptions()" class="hidden">
+                                    <i class="fa-solid fa-arrow-up text-emerald-500"></i>
+                                    <span class="text-xs font-bold">إيراد/دخل (In)</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Date Input -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">تاريخ المعاملة</label>
+                            <input type="date" id="tx_date" required value="2026-01-15" class="w-full text-xs p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none">
+                        </div>
+
+                        <!-- Amount Input -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">المبلغ (بالجنيه)</label>
+                            <div class="relative">
+                                <input type="number" id="tx_amount" step="0.01" required placeholder="0.00" class="w-full text-xs p-2.5 pl-10 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none font-semibold">
+                                <span class="absolute left-3 top-2.5 text-xs text-slate-400 font-bold">ج.م</span>
+                            </div>
+                        </div>
+
+                        <!-- Category Select -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">الفئة (Category)</label>
+                            <select id="tx_category" required class="w-full text-xs p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none bg-white">
+                                <!-- Options dynamically loaded -->
+                            </select>
+                        </div>
+
+                        <!-- Description Input -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">الوصف / البيان (Description)</label>
+                            <input type="text" id="tx_desc" placeholder="مثال: شراء مستلزمات بقالة" required class="w-full text-xs p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none">
+                        </div>
+
+                        <!-- Account Method -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">الحساب / البنك (اختياري)</label>
+                            <select id="tx_account" class="w-full text-xs p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none bg-white">
+                                <option value="Cash">كاش / نقدية</option>
+                                <option value="Misr">بنك مصر (Misr)</option>
+                                <option value="CIB">بنك CIB</option>
+                                <option value="Fibe">بنك Fibe</option>
+                                <option value="QNB">بنك QNB</option>
+                                <option value="CR">بطاقة أئتمان (Credit Card)</option>
+                            </select>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-2.5 text-xs rounded-lg shadow-sm transition-all flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-check-circle"></i>
+                            <span>تسجيل المعاملة الآن</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Transactions Table & Filters -->
+                <div class="lg:col-span-2 bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                    
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-3 border-b border-slate-100">
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-base">جدول المعاملات المسجلة</h3>
+                            <p class="text-xs text-slate-500">عرض كامل وتحديث فوري لسجل يناير 2026</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="exportToCSV()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs px-3 py-1.5 rounded-lg border border-slate-300 font-semibold flex items-center gap-1 transition-all">
+                                <i class="fa-solid fa-file-excel text-emerald-600"></i>
+                                <span>تصدير CSV</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Search & Filter Controls -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <!-- Search Box -->
+                        <div class="relative">
+                            <input type="text" id="table-search" oninput="renderTransactionsTable()" placeholder="بحث بالوصف أو الفئة..." class="w-full text-xs pr-8 pl-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none">
+                            <i class="fa-solid fa-magnifying-glass absolute right-2.5 top-2.5 text-slate-400 text-xs"></i>
+                        </div>
+
+                        <!-- Filter by Type -->
+                        <div>
+                            <select id="table-filter-type" onchange="renderTransactionsTable()" class="w-full text-xs py-2 px-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none bg-white">
+                                <option value="ALL">جميع المعاملات (كل الأنواع)</option>
+                                <option value="Expense">المصروفات فقط</option>
+                                <option value="Income">الإيرادات فقط</option>
+                            </select>
+                        </div>
+
+                        <!-- Filter by Category -->
+                        <div>
+                            <select id="table-filter-category" onchange="renderTransactionsTable()" class="w-full text-xs py-2 px-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none bg-white">
+                                <option value="ALL">جميع الفئات</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Live Summary Stats Row -->
+                    <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 grid grid-cols-3 text-center text-xs">
+                        <div>
+                            <span class="text-slate-500 block">عدد المعاملات</span>
+                            <span id="stat-count" class="font-bold text-slate-800 text-sm">0</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-500 block">مجموع المصروف المفلتر</span>
+                            <span id="stat-expenses" class="font-bold text-rose-600 text-sm">0.00 ج.م</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-500 block">مجموع الدخل المفلتر</span>
+                            <span id="stat-income" class="font-bold text-emerald-600 text-sm">0.00 ج.م</span>
+                        </div>
+                    </div>
+
+                    <!-- Table Container -->
+                    <div class="overflow-x-auto max-h-[480px] overflow-y-auto custom-scrollbar border border-slate-200 rounded-lg">
+                        <table class="w-full text-xs text-right border-collapse">
+                            <thead class="bg-slate-100 text-slate-700 font-bold sticky top-0 border-b border-slate-200 shadow-sm">
+                                <tr>
+                                    <th class="p-3">#</th>
+                                    <th class="p-3">التاريخ</th>
+                                    <th class="p-3">النوع</th>
+                                    <th class="p-3">البيان / الوصف</th>
+                                    <th class="p-3">الفئة</th>
+                                    <th class="p-3">المبلغ</th>
+                                    <th class="p-3">الحساب</th>
+                                    <th class="p-3 text-center">إجراء</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactions-table-body" class="divide-y divide-slate-100">
+                                <!-- Dynamic Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 3: BUDGET VARIANCE & HEALTH -->
+        <!-- ========================================== -->
+        <div id="view-comparison" class="hidden space-y-6">
+            
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                <h3 class="font-bold text-slate-800 text-lg mb-1">جدول التحليل والمقارنة المباشرة (شيت Jan 26)</h3>
+                <p class="text-xs text-slate-500 mb-6">مقارنة شاملة بين القيم المخططة والفعلي والتفاوت للشهور والبنود</p>
+
+                <!-- Detailed Variance Table -->
+                <div class="overflow-x-auto border border-slate-200 rounded-lg">
+                    <table class="w-full text-xs text-right">
+                        <thead class="bg-slate-800 text-white font-bold">
+                            <tr>
+                                <th class="p-3">اسم البند / الفئة</th>
+                                <th class="p-3">النوع</th>
+                                <th class="p-3">المخطط (Planned)</th>
+                                <th class="p-3">الفعلي (Actual)</th>
+                                <th class="p-3">الانحراف (Diff)</th>
+                                <th class="p-3">نسبة الإنجاز/الاستهلاك</th>
+                                <th class="p-3">تقييم الأداء</th>
+                            </tr>
+                        </thead>
+                        <tbody id="variance-table-body" class="divide-y divide-slate-200 font-medium">
+                            <!-- Dynamic rendering -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Recommendations & Insights -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-emerald-50 border border-emerald-200 p-5 rounded-xl">
+                    <div class="flex items-center gap-2 mb-3 text-emerald-800 font-bold">
+                        <i class="fa-solid fa-circle-check text-lg"></i>
+                        <h4>نقاط القوة والإنجاز المالي</h4>
+                    </div>
+                    <ul class="text-xs text-emerald-900 space-y-2 list-disc list-inside">
+                        <li><strong>تحقيق وفر كبير في الديون:</strong> تم إنفاق 14,727 ج.م فقط من أصل 40,000 ج.م مخطط (توفير 25,273 ج.م).</li>
+                        <li><strong>تجاوز هدف الراتب:</strong> ارتفع دخل الراتب الفعلي إلى 62,603 ج.م بزيادة +7,603 ج.م عن المخطط.</li>
+                        <li><strong>انخفاض السحب من المدخرات:</strong> تم الاستعانة بـ 19,718 ج.م فقط من بند الادخار بدلاً من 30,000 ج.م المخططة.</li>
+                        <li><strong>توفير بنود الطعام والرعاية الطبية والمنزل:</strong> بقاء الإنفاق أقل من الميزانية المحددة.</li>
+                    </ul>
+                </div>
+
+                <div class="bg-rose-50 border border-rose-200 p-5 rounded-xl">
+                    <div class="flex items-center gap-2 mb-3 text-rose-800 font-bold">
+                        <i class="fa-solid fa-triangle-exclamation text-lg"></i>
+                        <h4>بنود تتطلب المراجعة الضابطة</h4>
+                    </div>
+                    <ul class="text-xs text-rose-900 space-y-2 list-disc list-inside">
+                        <li><strong>ارتفاع بند الخدمات (Utilities):</strong> وصل إلى 12,423 ج.م بسبب شراء مستلزمات تقنية (ماوس/سوار/أجهزة)، يُوصى بإنشاء فئة مستقلا للأجهزة.</li>
+                        <li><strong>تجاوز الميزانية الشخصية والترفيه:</strong> بلغ الإنفاق الشخصي 6,267 ج.م (تجاوز الميزانية بـ 108%).</li>
+                        <li><strong>تراجع الإيرادات الأخرى:</strong> تحصيل 5,000 ج.م فقط من بند "أخرى" المخطط بـ 17,500 ج.م.</li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 mt-12 py-4 text-center text-xs text-slate-500">
+        <p>نظام إدارة الميزانية المالية والتحليل الشامل • سنة 2026</p>
+    </footer>
+
+    <!-- JavaScript Data Logic & Charts -->
+    <script>
+        // ==========================================
+        // INITIAL DATA FROM EXCEL (Sheets Jan & Jan 26)
+        // ==========================================
+        
+        const expenseCategories = ['Food', 'CR', 'Med', 'Home', 'Mazda', 'Personal', 'Utilities', 'Gas', 'Debt', 'Saving', 'Intertainment', 'Education', 'Emergency', 'Water'];
+        const incomeCategories = ['Saving', 'Tasnim', 'Hassan', 'Anwar', 'Credit', 'Salary', 'Other'];
+
+        // Budget planned & actual benchmark data (Sheet Jan 26)
+        const budgetSummary = {
+            expenses: [
+                { name: 'Food', planned: 2000, actual: 1518.5 },
+                { name: 'CR', planned: 15000, actual: 12214 },
+                { name: 'Med', planned: 3000, actual: 675 },
+                { name: 'Home', planned: 15000, actual: 12366 },
+                { name: 'Mazda', planned: 10000, actual: 10035 },
+                { name: 'Personal', planned: 3000, actual: 6267 },
+                { name: 'Utilities', planned: 1000, actual: 12423 },
+                { name: 'Gas', planned: 6000, actual: 5604 },
+                { name: 'Debt', planned: 40000, actual: 14727 },
+                { name: 'Saving', planned: 1000, actual: 120 },
+                { name: 'Intertainment', planned: 2000, actual: 4121 },
+                { name: 'Education', planned: 5000, actual: 5300 },
+                { name: 'Emergency', planned: 2000, actual: 1030 },
+                { name: 'Water', planned: 200, actual: 574 }
+            ],
+            income: [
+                { name: 'Saving', planned: 30000, actual: 19718 },
+                { name: 'Tasnim', planned: 4924, actual: 4924 },
+                { name: 'Hassan', planned: 1250, actual: 1250 },
+                { name: 'Anwar', planned: 2677, actual: 2680 },
+                { name: 'Credit', planned: 425, actual: 425 },
+                { name: 'Salary', planned: 55000, actual: 62603 },
+                { name: 'Other', planned: 17500, actual: 5000 }
+            ]
+        };
+
+        // Real transactions pre-loaded from Sheet "Jan"
+        let rawTransactions = [
+            { id: 1, date: '2026-01-01', type: 'Expense', desc: 'Fatema', category: 'Personal', amount: 1001, account: 'Cash' },
+            { id: 2, date: '2026-01-01', type: 'Expense', desc: 'مصروف منزل', category: 'Home', amount: 101, account: 'Cash' },
+            { id: 3, date: '2026-01-01', type: 'Expense', desc: 'فطار', category: 'Personal', amount: 30, account: 'Cash' },
+            { id: 4, date: '2026-01-01', type: 'Expense', desc: 'الرسالة (نجلاء)', category: 'Education', amount: 5000, account: 'Cash' },
+            { id: 5, date: '2026-01-01', type: 'Expense', desc: 'سارة', category: 'Personal', amount: 300, account: 'Cash' },
+            { id: 6, date: '2026-01-01', type: 'Expense', desc: 'حلاقة', category: 'Personal', amount: 100, account: 'Cash' },
+            { id: 7, date: '2026-01-01', type: 'Expense', desc: 'حلويات', category: 'Personal', amount: 35, account: 'Cash' },
+            { id: 8, date: '2026-01-03', type: 'Expense', desc: 'قهوة', category: 'Personal', amount: 50, account: 'Cash' },
+            { id: 9, date: '2026-01-03', type: 'Expense', desc: 'فاطمة', category: 'Home', amount: 5000, account: 'Cash' },
+            { id: 10, date: '2026-01-04', type: 'Expense', desc: 'بنزين', category: 'Gas', amount: 947, account: 'Cash' },
+            { id: 11, date: '2026-01-04', type: 'Expense', desc: 'علاج فاطمة', category: 'Med', amount: 490, account: 'Cash' },
+            { id: 12, date: '2026-01-05', type: 'Expense', desc: 'نت 0155', category: 'Utilities', amount: 207, account: 'Cash' },
+            { id: 13, date: '2026-01-05', type: 'Expense', desc: 'سوار ساعة', category: 'Utilities', amount: 139, account: 'Cash' },
+            { id: 14, date: '2026-01-05', type: 'Expense', desc: 'ماوس', category: 'Utilities', amount: 225, account: 'Cash' },
+            { id: 15, date: '2026-01-05', type: 'Expense', desc: 'ماوس إضافي', category: 'Utilities', amount: 449, account: 'Cash' },
+            { id: 16, date: '2026-01-05', type: 'Expense', desc: 'مناديل ورقية', category: 'Home', amount: 190, account: 'Cash' },
+            
+            // Income Transactions
+            { id: 101, date: '2026-01-01', type: 'Income', desc: 'تحويل سحب شهر 12', category: 'Saving', amount: 19718, account: 'Bank' },
+            { id: 102, date: '2026-01-01', type: 'Income', desc: 'استحقاق تسنيم', category: 'Tasnim', amount: 4924, account: 'Bank' },
+            { id: 103, date: '2026-01-01', type: 'Income', desc: 'استحقاق حسن', category: 'Hassan', amount: 1250, account: 'Bank' },
+            { id: 104, date: '2026-01-09', type: 'Income', desc: 'استحقاق أنور', category: 'Anwar', amount: 2680, account: 'Bank' },
+            { id: 105, date: '2026-01-21', type: 'Income', desc: 'تسوية كروت أئتمان', category: 'Credit', amount: 425, account: 'Credit' },
+            { id: 106, date: '2026-01-28', type: 'Income', desc: 'الراتب الشهري', category: 'Salary', amount: 62603, account: 'Misr' },
+            { id: 107, date: '2026-01-30', type: 'Income', desc: 'إيراد رسلان وقروض أخرى', category: 'Other', amount: 5000, account: 'Cash' }
+        ];
+
+        // Global Chart Instances
+        let expensesChartInstance = null;
+        let pieChartInstance = null;
+        let incomeChartInstance = null;
+
+        // ==========================================
+        // INITIALIZATION
+        // ==========================================
+        document.addEventListener('DOMContentLoaded', () => {
+            initCategoryDropdowns();
+            initCharts();
+            renderProgressBars();
+            renderTransactionsTable();
+            renderVarianceTable();
+        });
+
+        // Tab Switching Logic
+        function switchTab(tabName) {
+            ['dashboard', 'entry', 'comparison'].forEach(t => {
+                document.getElementById(`view-${t}`).classList.add('hidden');
+                document.getElementById(`tab-${t}`).classList.remove('active');
+            });
+
+            document.getElementById(`view-${tabName}`).classList.remove('hidden');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+
+            if(tabName === 'dashboard') {
+                setTimeout(() => {
+                    if(expensesChartInstance) expensesChartInstance.resize();
+                    if(pieChartInstance) pieChartInstance.resize();
+                    if(incomeChartInstance) incomeChartInstance.resize();
+                }, 100);
+            }
+        }
+
+        // Form Category Selector Population
+        function initCategoryDropdowns() {
+            updateCategoryOptions();
+            
+            // Populate filter category dropdown
+            const filterCat = document.getElementById('table-filter-category');
+            filterCat.innerHTML = '<option value="ALL">جميع الفئات</option>';
+            const allCats = [...new Set([...expenseCategories, ...incomeCategories])];
+            allCats.forEach(cat => {
+                filterCat.innerHTML += `<option value="${cat}">${cat}</option>`;
+            });
+        }
+
+        function updateCategoryOptions() {
+            const selectedType = document.querySelector('input[name="tx_type"]:checked').value;
+            const catSelect = document.getElementById('tx_category');
+            catSelect.innerHTML = '';
+            
+            const list = selectedType === 'Expense' ? expenseCategories : incomeCategories;
+            list.forEach(cat => {
+                catSelect.innerHTML += `<option value="${cat}">${cat}</option>`;
+            });
+        }
+
+        // ==========================================
+        // CHARTS CREATION (Chart.js)
+        // ==========================================
+        function initCharts() {
+            // 1. Grouped Bar Chart: Expenses
+            const ctxExp = document.getElementById('expensesChart').getContext('2d');
+            expensesChartInstance = new Chart(ctxExp, {
+                type: 'bar',
+                data: {
+                    labels: budgetSummary.expenses.map(item => item.name),
+                    datasets: [
+                        {
+                            label: 'المخطط (Planned)',
+                            data: budgetSummary.expenses.map(item => item.planned),
+                            backgroundColor: '#94a3b8',
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'الفعلي (Actual)',
+                            data: budgetSummary.expenses.map(item => item.actual),
+                            backgroundColor: '#e11d48',
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top', labels: { font: { family: 'Cairo' } } },
+                        tooltip: { callbacks: { label: (c) => ` ${c.dataset.label}: ${c.raw.toLocaleString()} ج.م` } }
+                    },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { font: { family: 'Cairo', size: 10 } } },
+                        y: { ticks: { font: { family: 'Cairo' } } }
+                    }
+                }
+            });
+
+            // 2. Pie/Doughnut Chart: Actual Expenses
+            const ctxPie = document.getElementById('categoryPieChart').getContext('2d');
+            pieChartInstance = new Chart(ctxPie, {
+                type: 'doughnut',
+                data: {
+                    labels: budgetSummary.expenses.map(i => i.name),
+                    datasets: [{
+                        data: budgetSummary.expenses.map(i => i.actual),
+                        backgroundColor: [
+                            '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', 
+                            '#ec4899', '#06b6d4', '#84cc16', '#64748b', '#14b8a6',
+                            '#a855f7', '#f97316', '#0284c7', '#d97706'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { callbacks: { label: (c) => ` ${c.label}: ${c.raw.toLocaleString()} ج.م` } }
+                    },
+                    cutout: '65%'
+                }
+            });
+
+            // 3. Horizontal Bar Chart: Income
+            const ctxInc = document.getElementById('incomeChart').getContext('2d');
+            incomeChartInstance = new Chart(ctxInc, {
+                type: 'bar',
+                data: {
+                    labels: budgetSummary.income.map(i => i.name),
+                    datasets: [
+                        {
+                            label: 'المخطط',
+                            data: budgetSummary.income.map(i => i.planned),
+                            backgroundColor: '#cbd5e1',
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'الفعلي المحصل',
+                            data: budgetSummary.income.map(i => i.actual),
+                            backgroundColor: '#10b981',
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top', labels: { font: { family: 'Cairo' } } }
+                    },
+                    scales: {
+                        x: { ticks: { font: { family: 'Cairo' } } },
+                        y: { ticks: { font: { family: 'Cairo' } } }
+                    }
+                }
+            });
+        }
+
+        // ==========================================
+        // RENDER PROGRESS BARS & VARIANCE TABLES
+        // ==========================================
+        function renderProgressBars() {
+            const container = document.getElementById('budget-progress-list');
+            container.innerHTML = '';
+
+            budgetSummary.expenses.forEach(item => {
+                const percent = Math.min(Math.round((item.actual / item.planned) * 100), 200);
+                let colorClass = 'bg-emerald-500';
+                let textClass = 'text-emerald-700';
+
+                if(percent > 100) {
+                    colorClass = 'bg-rose-500';
+                    textClass = 'text-rose-700 font-bold';
+                } else if(percent > 85) {
+                    colorClass = 'bg-amber-500';
+                    textClass = 'text-amber-700';
+                }
+
+                container.innerHTML += `
+                    <div>
+                        <div class="flex justify-between items-center text-xs mb-1">
+                            <span class="font-bold text-slate-700">${item.name}</span>
+                            <span class="${textClass}">${item.actual.toLocaleString()} / ${item.planned.toLocaleString()} ج.م (${percent}%)</span>
+                        </div>
+                        <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                            <div class="${colorClass} h-2 rounded-full transition-all duration-500" style="width: ${Math.min(percent, 100)}%"></div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function renderVarianceTable() {
+            const tbody = document.getElementById('variance-table-body');
+            tbody.innerHTML = '';
+
+            // Expenses Rows
+            budgetSummary.expenses.forEach(item => {
+                const diff = item.planned - item.actual; // positive means saved
+                const ratio = Math.round((item.actual / item.planned) * 100);
+                const isOver = diff < 0;
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-3 font-bold text-slate-800">${item.name}</td>
+                        <td class="p-3"><span class="bg-rose-100 text-rose-700 px-2 py-0.5 rounded text-[11px]">مصروف</span></td>
+                        <td class="p-3">${item.planned.toLocaleString()} ج.م</td>
+                        <td class="p-3 font-semibold">${item.actual.toLocaleString()} ج.م</td>
+                        <td class="p-3 ${isOver ? 'text-rose-600 font-bold' : 'text-emerald-600 font-bold'}">
+                            ${isOver ? '-' : '+'}${Math.abs(diff).toLocaleString()} ج.م
+                        </td>
+                        <td class="p-3">${ratio}%</td>
+                        <td class="p-3">
+                            ${isOver 
+                                ? '<span class="bg-rose-100 text-rose-800 px-2 py-0.5 rounded text-[11px] font-bold"><i class="fa-solid fa-circle-exclamation ml-1"></i>تجاوز الميزانية</span>' 
+                                : '<span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-[11px] font-bold"><i class="fa-solid fa-check ml-1"></i>ضمن الحدود/وفر</span>'}
+                        </td>
+                    </tr>
+                `;
+            });
+
+            // Income Rows
+            budgetSummary.income.forEach(item => {
+                const diff = item.actual - item.planned;
+                const ratio = Math.round((item.actual / item.planned) * 100);
+                const isShort = diff < 0;
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 bg-slate-50/50">
+                        <td class="p-3 font-bold text-slate-800">${item.name}</td>
+                        <td class="p-3"><span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-[11px]">إيراد</span></td>
+                        <td class="p-3">${item.planned.toLocaleString()} ج.م</td>
+                        <td class="p-3 font-semibold">${item.actual.toLocaleString()} ج.م</td>
+                        <td class="p-3 ${isShort ? 'text-amber-600 font-bold' : 'text-emerald-600 font-bold'}">
+                            ${diff >= 0 ? '+' : ''}${diff.toLocaleString()} ج.م
+                        </td>
+                        <td class="p-3">${ratio}%</td>
+                        <td class="p-3">
+                            ${ratio >= 100 
+                                ? '<span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-[11px] font-bold">مكتمل 100%</span>' 
+                                : '<span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded text-[11px] font-bold">تحصيل جزئي</span>'}
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // ==========================================
+        // TRANSACTIONS TABLE RENDERING & LOGIC
+        // ==========================================
+        function renderTransactionsTable() {
+            const tbody = document.getElementById('transactions-table-body');
+            const searchValue = document.getElementById('table-search').value.toLowerCase();
+            const filterType = document.getElementById('table-filter-type').value;
+            const filterCat = document.getElementById('table-filter-category').value;
+
+            let filtered = rawTransactions.filter(item => {
+                const matchSearch = item.desc.toLowerCase().includes(searchValue) || item.category.toLowerCase().includes(searchValue);
+                const matchType = (filterType === 'ALL') || (item.type === filterType);
+                const matchCat = (filterCat === 'ALL') || (item.category === filterCat);
+                return matchSearch && matchType && matchCat;
+            });
+
+            // Sort by date descending
+            filtered.sort((a,b) => new Date(b.date) - new Date(a.date));
+
+            tbody.innerHTML = '';
+
+            let totalExp = 0;
+            let totalInc = 0;
+
+            if(filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center p-6 text-slate-400 font-semibold">لا توجد معاملات مطابقة للبحث</td></tr>`;
+            } else {
+                filtered.forEach((tx, idx) => {
+                    if(tx.type === 'Expense') totalExp += Number(tx.amount);
+                    if(tx.type === 'Income') totalInc += Number(tx.amount);
+
+                    const isExp = tx.type === 'Expense';
+
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="p-3 text-slate-400">${idx + 1}</td>
+                            <td class="p-3 font-semibold text-slate-700">${tx.date}</td>
+                            <td class="p-3">
+                                <span class="${isExp ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-700'} px-2 py-0.5 rounded text-[11px] font-bold">
+                                    ${isExp ? 'مصروف' : 'إيراد'}
+                                </span>
+                            </td>
+                            <td class="p-3 font-bold text-slate-800">${tx.desc}</td>
+                            <td class="p-3 text-slate-600"><span class="bg-slate-100 px-2 py-0.5 rounded border border-slate-200">${tx.category}</span></td>
+                            <td class="p-3 font-bold ${isExp ? 'text-rose-600' : 'text-emerald-600'}">
+                                ${isExp ? '-' : '+'}${Number(tx.amount).toLocaleString()} ج.م
+                            </td>
+                            <td class="p-3 text-slate-500">${tx.account || 'كاش'}</td>
+                            <td class="p-3 text-center">
+                                <button onclick="deleteTransaction(${tx.id})" class="text-slate-400 hover:text-rose-600 p-1 transition-colors" title="حذف والمعاملة">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+
+            // Update stats
+            document.getElementById('stat-count').innerText = filtered.length;
+            document.getElementById('stat-expenses').innerText = `${totalExp.toLocaleString()} ج.م`;
+            document.getElementById('stat-income').innerText = `${totalInc.toLocaleString()} ج.م`;
+        }
+
+        // Add Transaction Handler
+        function handleAddTransaction(e) {
+            e.preventDefault();
+
+            const type = document.querySelector('input[name="tx_type"]:checked').value;
+            const date = document.getElementById('tx_date').value;
+            const amount = parseFloat(document.getElementById('tx_amount').value);
+            const category = document.getElementById('tx_category').value;
+            const desc = document.getElementById('tx_desc').value;
+            const account = document.getElementById('tx_account').value;
+
+            if(!amount || amount <= 0) {
+                alert('يرجى إدخال مبلغ صحيح');
+                return;
+            }
+
+            const newTx = {
+                id: Date.now(),
+                date,
+                type,
+                desc,
+                category,
+                amount,
+                account
+            };
+
+            rawTransactions.unshift(newTx);
+
+            // Clear inputs
+            document.getElementById('tx_amount').value = '';
+            document.getElementById('tx_desc').value = '';
+
+            // Update dashboard state if matching categories
+            updateBudgetSummaryFromNewTx(newTx);
+
+            renderTransactionsTable();
+            renderProgressBars();
+            renderVarianceTable();
+
+            alert('تم تسجيل المعاملة بنجاح والتحديث المباشر للشيت!');
+        }
+
+        function deleteTransaction(id) {
+            if(confirm('هل أنت تأكد من حذف هذه المعاملة؟')) {
+                rawTransactions = rawTransactions.filter(t => t.id !== id);
+                renderTransactionsTable();
+            }
+        }
+
+        function updateBudgetSummaryFromNewTx(tx) {
+            if(tx.type === 'Expense') {
+                const item = budgetSummary.expenses.find(e => e.name === tx.category);
+                if(item) item.actual += tx.amount;
+            } else {
+                const item = budgetSummary.income.find(i => i.name === tx.category);
+                if(item) item.actual += tx.amount;
+            }
+
+            // Update Chart datasets
+            expensesChartInstance.data.datasets[1].data = budgetSummary.expenses.map(i => i.actual);
+            expensesChartInstance.update();
+
+            pieChartInstance.data.datasets[0].data = budgetSummary.expenses.map(i => i.actual);
+            pieChartInstance.update();
+
+            incomeChartInstance.data.datasets[1].data = budgetSummary.income.map(i => i.actual);
+            incomeChartInstance.update();
+        }
+
+        // Export Table to CSV
+        function exportToCSV() {
+            let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+            csvContent += "التاريخ,النوع,البيان,الفئة,المبلغ,الحساب\n";
+
+            rawTransactions.forEach(tx => {
+                csvContent += `"${tx.date}","${tx.type}","${tx.desc}","${tx.category}","${tx.amount}","${tx.account}"\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `معاملات_يناير_2026.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>
