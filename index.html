@@ -918,6 +918,28 @@
             link.click();
             document.body.removeChild(link);
         }
+        // كود إرسال المعاملة المضافة إلى Google Sheets
+async function sendTransactionToGoogleSheet(data) {
+  const scriptURL = 'ضع_رابط_WEB_APP_URL_الخاص_بـ_Google_Apps_Script_هنا';
+
+  try {
+    const response = await fetch(scriptURL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8',
+      },
+      body: JSON.stringify(data)
+    });
+
+    const result = await response.json();
+    if (result.result === 'success') {
+      alert('تم حفظ البيانات بنجاح في Google Sheets!');
+    }
+  } catch (error) {
+    console.error('حدث خطأ أثناء الإرسال:', error);
+  }
+}
     </script>
+
 </body>
 </html>
